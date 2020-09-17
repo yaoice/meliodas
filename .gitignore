@@ -1,0 +1,14 @@
+/.vscode/
+/.idea/
+/output/
+/_output/
+/debug/
+/cmdtke-controller-manager
+/baremetal-cluster-provider.log
+/baremetal-cluster-provider-error.log
+/res
+/data
+/pkg/installer/keyPem.pem
+/pkg/installer/certPem.crt
+/official-plugins/
+.DS_Store

@@ -1,0 +1,177 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: meliodas
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/status
+    verbs:
+      - patch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: meliodas
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: meliodas
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: meliodas
+subjects:
+  - kind: ServiceAccount
+    name: meliodas
+    namespace: kube-system
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kube-meliodas-cfg
+  namespace: kube-system
+  labels:
+    tier: node
+    app: meliodas
+data:
+  00-meliodas.conflist: |
+    {
+      "name": "cni0",
+      "cniVersion": "0.3.1",
+      "plugins": [
+      {
+        "type": "ipvlan",
+        "master": "enp1s0",
+        "ipam": {
+          "type": "tcnp-ipam",
+          "openstackConf": {
+            "username": "admin",
+            "password": "b974a1991171",
+            "project": "admin",
+            "domain": "default",
+            "authUrl": "http://192.168.55.250:35357/v3"
+          },
+          "neutronConf": {
+            "networks": ["4ae3f89d-b41a-4fd1-99d3-6a0861182946"],
+            "mode": "mix"
+          },
+          "routes": [{
+                       "dst": "0.0.0.0/0"
+                     }]
+        }
+      },
+      {
+        "type": "veth-host",
+        "serviceCidr": "172.20.252.0/22",
+        "hostInterface": "enp1s0",
+        "containerInterface": "veth0",
+        "ipMasq": true
+      }
+      ]
+    }
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: kube-meliodas-ds
+  namespace: kube-system
+  labels:
+    tier: node
+    app: meliodas
+spec:
+  template:
+    metadata:
+      labels:
+        tier: node
+        app: meliodas
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+        tcnp/cni-network: meliodas
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+      serviceAccountName: meliodas
+      initContainers:
+        - name: install-cni-binaries
+          image: k8s_infra/tcnp/k8s-network:v1.0.0
+          command:
+            - sh
+          args:
+            - -c
+            - cp -r /opt/cni/bin/* /host/opt/cni/bin/
+          volumeMounts:
+            - name: host-cni-bin
+              mountPath: /host/opt/cni/bin
+        - name: install-cni-cfg
+          image: k8s_infra/tcnp/k8s-network:v1.0.0
+          command:
+            - cp
+          args:
+            - -f
+            - /etc/kube-meliodas/00-meliodas.conflist
+            - /etc/cni/net.d/00-meliodas.conflist
+          volumeMounts:
+            - name: host-cni-cfg
+              mountPath: /etc/cni/net.d
+            - name: meliodas-cfg
+              mountPath: /etc/kube-meliodas/
+      containers:
+        - name: kube-meliodas
+          image: k8s_infra/tcnp/k8s-network:v1.0.0
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "50Mi"
+            limits:
+              cpu: "100m"
+              memory: "100Mi"
+          securityContext:
+            privileged: true
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: run
+              mountPath: /run
+            - name: meliodas-cfg
+              mountPath: /etc/kube-meliodas/
+      volumes:
+        - name: run
+          hostPath:
+            path: /run
+        - name: host-cni-cfg
+          hostPath:
+            path: /etc/cni/net.d
+        - name: meliodas-cfg
+          configMap:
+            name: kube-meliodas-cfg
+        - name: host-cni-bin
+          hostPath:
+            path: /opt/cni/bin
