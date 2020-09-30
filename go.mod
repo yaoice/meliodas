@@ -6,6 +6,7 @@ require (
 	github.com/containernetworking/plugins v0.7.5
 	github.com/coreos/go-iptables v0.4.1
 	github.com/evanphx/json-patch v4.2.0+incompatible // indirect
+	github.com/godbus/dbus v0.0.0-20181101234600-2ff6f7ffd60f
 	github.com/gophercloud/gophercloud v0.12.0
 	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/j-keck/arping v1.0.1
@@ -13,13 +14,14 @@ require (
 	github.com/onsi/gomega v1.9.0
 	github.com/vishvananda/netlink v1.1.0
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
+	golang.org/x/sys v0.0.0-20191128015809-6d18c012aee9
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	k8s.io/api v0.19.0-rc.3
 	k8s.io/apimachinery v0.19.0-rc.3
 	k8s.io/client-go v0.19.0-rc.3
 	k8s.io/klog v1.0.0
 	k8s.io/kubernetes v1.18.8
-	k8s.io/utils v0.0.0-20200731180307-f00132d28269 // indirect
+	k8s.io/utils v0.0.0-20200731180307-f00132d28269
 )
 
 replace (
