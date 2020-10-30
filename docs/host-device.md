@@ -37,7 +37,7 @@
               }
           },
           {
-              "type": "veth-vpc",
+              "type": "veth-host",
               "serviceCidr": "10.96.0.0/12",
               "hostInterface": "eth0",
               "containerInterface": "veth0",
