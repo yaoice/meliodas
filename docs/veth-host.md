@@ -1,5 +1,3 @@
-[TOC]
-
 ## 适用场景
 当使用macvlan、ipvlan、sriov等underlay网络方案时，如遇到pod与宿主机IP不通或无法访问serviceIP，可配合使用该cni插件有效解决问题。
 

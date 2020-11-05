@@ -106,7 +106,6 @@ spec:
       hostNetwork: true
       nodeSelector:
         beta.kubernetes.io/arch: amd64
-        tcnp/cni-network: meliodas
       tolerations:
         - key: node-role.kubernetes.io/master
           operator: Exists
@@ -114,7 +113,7 @@ spec:
       serviceAccountName: meliodas
       initContainers:
         - name: install-cni-binaries
-          image: k8s_infra/tcnp/k8s-network:v1.0.0
+          image: meliodas:v1
           command:
             - sh
           args:
@@ -124,7 +123,7 @@ spec:
             - name: host-cni-bin
               mountPath: /host/opt/cni/bin
         - name: install-cni-cfg
-          image: k8s_infra/tcnp/k8s-network:v1.0.0
+          image: meliodas:v1 
           command:
             - cp
           args:
@@ -138,7 +137,7 @@ spec:
               mountPath: /etc/kube-meliodas/
       containers:
         - name: kube-meliodas
-          image: k8s_infra/tcnp/k8s-network:v1.0.0
+          image: meliodas:v1 
           resources:
             requests:
               cpu: "100m"

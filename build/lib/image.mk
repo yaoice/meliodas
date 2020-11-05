@@ -5,7 +5,7 @@
 DOCKER := docker
 DOCKER_SUPPORTED_VERSIONS ?= 17|18|19
 
-REGISTRY_PREFIX ?= registry.tcnp-dev.oa.com/tcnp_meliodas
+REGISTRY_PREFIX ?= iceyao/meliodas
 
 EXTRA_ARGS ?=
 _DOCKER_BUILD_EXTRA_ARGS :=

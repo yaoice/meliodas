@@ -1,5 +1,3 @@
-[TOC]
-
 ## neutron ipam插件
 
 基于[host-local](https://github.com/containernetworking/plugins/tree/master/plugins/ipam/host-local)插件二次开发,

@@ -10,6 +10,11 @@ OpenStack虚拟机环境
 
 ## 实验步骤
 
+使用`ip monitor`可以实时查看网络设备的状态
+```
+# ip monitor all
+```
+
 1. 创建两个测试的network namespace
 ```
 # ip netns add test1
